@@ -9,6 +9,7 @@ translate([0,80,0]) {
 
 translate([161,140,0]) {
     arduino_row();
+    arduino_bumpers();
 }
 
 difference() {
@@ -69,18 +70,21 @@ module arduino_row() {
         translate([130, 6.5, 3]) {
             arduino();
         }
-        rotate([0,0,180]) {
-            render() {
-                rotate([0,0,180]) {
-                    translate([10, 6.5, 0]) {
-                        bumper();
-                    }
-                    translate([70, 6.5, 0]) {
-                        bumper();
-                    }
-                    translate([130, 6.5, 0]) {
-                        bumper();
-                    }
+    }
+}
+
+module arduino_bumpers() {
+    rotate([0,0,180]) {
+        render() {
+            rotate([0,0,180]) {
+                translate([10, 6.5, 0]) {
+                    bumper();
+                }
+                translate([70, 6.5, 0]) {
+                    bumper();
+                }
+                translate([130, 6.5, 0]) {
+                    bumper();
                 }
             }
         }
