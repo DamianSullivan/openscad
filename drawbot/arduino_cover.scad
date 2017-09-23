@@ -1,7 +1,6 @@
 include <honeycomb.scad>
 include <arduino.scad>
 
-
 translate([0,80,0]) {
     rotate([-180,0,0]) {
         //bottom([260,80,2]);
@@ -11,8 +10,6 @@ translate([0,80,0]) {
 translate([161,140,0]) {
     arduino_row();
 }
-
-
 
 difference() {
     union() {
