@@ -22,119 +22,99 @@ module cover_squared_off(size, thickness, opening_size) {
     opening_size_x = opening_size[0];
     opening_size_y = opening_size[1];
     
-    difference() {
-        union() {
+    union() {
+
+        translate([0,30,48]) {
             difference() {
-                cube([x,y,z]);
-                translate([thickness,thickness,-thickness]) {
-                    cube([x-2*thickness,y-2*thickness,z-thickness]);
-                    
-                }
-                // Back grille
-                translate([20,3,5]) {
-                    rotate([90,0,0]) {
-                        
-                        honeycomb(36, 7, 3, 3, 4, 20);
-                    }
-                }
-                // Mounting screw hole 1
-                translate([8,0,z/2]) {
-                    rotate([90,0,0]) {
-                        cylinder(h=4, d=5);
-                    }
-                }
-                // Mounting screw hole 2
-                translate([x-5,0,z/2]) {
-                    rotate([90,0,0]) {
-                        cylinder(h=2*thickness, d=5, $fn=32);
-                    }
-                }
+                cube([x - 10, y - 10, 10]);
+                cube([
             }
-            // Back grille cutout border
-            translate([((x-96)/2)-2,0,16.5]) {
-                cube([100, 4, 20]);
-            }
+            
         }
-        // Back grille cutout
-        translate([(x-96)/2,0,18.5]) {
-            cube([96, 5, 16]);
-        }
-        // Title
-        translate([171,37,50]) {
-            rotate([0,0,180]) {
-                linear_extrude(3) {
-                    text(text="Drawbot", size=12, font="Abyssinica SIL:style=Italic");
-                }
-            }
+        translate([0,30,48]) {
+            honeycombed_cube_with_margins([
+                x - 10, y - 10, 3], [5, 5], 4, 1);
         }
     }
 }
 */
 
-honeycombed_cube_with_margins([210, 55, 2], [5, 5], 4, 1);
-module honeycombed_cube_with_margins(size, margin, aperature, spacing) {
-    // The base size of the cube
-    size_x = size[0];
-    size_y = size[1];
-    size_z = size[2];
-    
-    // The space between the honeycomb grid and the edge of the cube.
-    margin_x = margin[0];
-    margin_y = margin[1];
-    
-    // The size of the box containing the honeycombs.
-    hex_box_x = size_x - 2 * margin_x;
-    hex_box_y = size_y - 2 * margin_y;
-    hex_box_z = size_z;
-    
-    difference() {
-        // Base shape
-        cube(size);
-        // Honeycomb grille
-        translate([margin_x, margin_y, 0]) {
-            translate([aperature / 2, aperature / 2, 0]) {
-                hex_grid(
-                    [hex_box_x, 
-                     hex_box_y, 
-                     hex_box_z],
-                    aperature,
-                    spacing);
+
+//titlebar([200,20,20]);
+module titlebar(size) {
+    cube(size);
+}
+
+faceplate([200, 85, 4], [10, 10], 2, 4, 1);
+module faceplate(size, margin, frame_thickness, aperature, spacing) {
+    union() {
+        difference() {
+          cube(size);
+          translate([margin[0], margin[1], 2]) {
+              translate([aperature / 2, aperature / 2, 0]) {
+                  hex_grid([
+                          size[0] - 2 * margin[0],
+                          size[1] - 2 * margin[1],
+                          size[2]
+                      ],
+                      aperature,
+                      spacing
+                  );
+                }
+            }
+        }
+        translate([0, 0, size[2]]) {
+            union() {
+                cube(size);
+                translate([frame_thickness/2, frame_thickness/2, 0]) {
+                    cube([size[0] - frame_thickness,
+                          size[1] - frame_thickness,
+                          frame_thickness]);
+                }
             }
         }
     }
-    
 }
+
+
 // TODO(dsullivan): The grid does not conform to [x,y] size, find the reason.
-// TODO(dsullivan): Document the math in this module.
 module hex_grid(size, aperature, spacing) {
     size_x = size[0];
     size_y = size[1];
     size_z = size[2];
 
-    cos60 = cos(60);
+    // Sine of 60 is the y-length from the center of the hexagon to the edge of the facet.
     sin60 = sin(60);
-    cell_size = aperature + spacing;
-    // TODO(dsullivan): Rename this var.
-    a = cell_size * sin60;
+    
+    // Cosine of 60 is the x-length from the center of the hexagon to the edge of the facet.
+    cos60 = cos(60);
 
-    numberX = floor(size_x / (2 * a * sin60));
-    oddX = numberX % 2;
+    // The aperature param is the diameter of the circle that the hexagon cell will fit into.
+    // To find the y-height of the hexagon froHUm the center of the circle
+    // (half the height of the hexagon) to the edge with spacing,
+    // we will need to multiply by the sin(60)
+    // (the angle is 360 total / 6 sides = 60 degrees for each angle).
+    hex_radius = (aperature + spacing) * sin60;
 
-    numberY =  floor(size_y / a);
-    oddY = numberY % 2;
+    // The number of hexagons across the grid on the x axis.
+    // number_cells_x = floor(size_x / (2 * hex_radius * sin60));
+    number_cells_x = floor(size_x / hex_radius) - 1;
+    
+    // The number of hexagons across the grid on the y axis.
+    number_cells_y = floor(size_y / hex_radius) - 1;
 
-    deltaY = oddY == 1 ? a / 2 : 0;
+    deltaY = number_cells_y % 2 == 1 ? hex_radius / 2 : 0;
 
-    x0 = numberX * 2 * a * sin60;
-    y0 = numberY * a/2 + deltaY;
+    x0 = number_cells_x * hex_radius;
+    y0 = number_cells_y * hex_radius;
 
-    for (x = [ 0 : 2 * a * sin60 : x0]) {
-        for (y = [ 0 : a : y0]) {
+    for (x = [ 0 : 2 * hex_radius * sin60 : x0]) {
+        for (y = [ 0 : hex_radius : y0]) {
             translate([x, y, 0]) {
                 cylinder(d = aperature, h = size_z, $fn = 6);
             }
             
-            translate([x + a * sin60, y + a * cos60 , 0]) {
+            translate([x + hex_radius * sin60, y + hex_radius * cos60 , 0]) {
                 cylinder(d = aperature, h = size_z, $fn = 6);
             }
        }
