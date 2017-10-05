@@ -1,20 +1,21 @@
 include <arduino.scad>
 
 // Controls for rendering partial parts of the box.
-print_sidebar = true;
+print_sidebar = false;
 print_faceplate = true;
 print_faceplate_box = true;
 print_title_support_holes = true;
 print_bottom_plate = false;
 
-// Prints the title lettering over the title suppors for testing alignment.
+// Testing:
+
+// Prints the title lettering over the title supports for testing alignment.
 print_test_title = false;
-// Prints an arduino for alignment testing.
+
+// Print a arduino model in the expected location.
 print_test_arduino_row = false;
 
 // TODO(dsullivan): Faceplate dimensions have changed to honeycomb.
-
-// Create the arduino top cover.
 cover_squared_off(
     2,              // thickness
     [140, 20, 35],  // sidebar_size
@@ -31,15 +32,14 @@ cover_squared_off(
     1,              // title_spacing
     [-4, -4]);       // title_margin
 
-// Create the bottom plate.
-if (print_bottom_plate) {
+if (print_bottom_plate) {    
     translate([0,80,0]) {
         rotate([-180,0,0]) {
             bottom([260,80,2]);
         }
     }
 }
-
+    
 // Testing:
 
 // Print a title on the sidebar for checking alignment.
@@ -60,7 +60,7 @@ if (print_test_title) {
                         2,
                         1);
                 }
-
+                
                 // Draw the holes for the lettering support.
                 if (print_title_support_holes) {
                     drawbot_letter_supports(3, .5, .5);
@@ -84,7 +84,7 @@ module cover_squared_off(
             difference() {
                 // Create a raised sidebar.
                 sidebar(sidebar_size, thickness, side_depth);
-
+                
                 // Embed a title on the sidebar.
                 translate([
                     sidebar_size[0] + title_margin[0],
@@ -95,18 +95,17 @@ module cover_squared_off(
                             if (print_title_support_holes) {
                                 drawbot_letter_supports(3, .5, .5);
                             }
-                        }
+                        } 
                 }
             }
         }
-
         if (print_faceplate) {
             // Create the faceplate.
-            translate([0,
-                      sidebar_size[1] - thickness,
+            translate([thickness,
+                      sidebar_size[1],
                       sidebar_size[2] - side_depth - 2 * thickness]) {
                 honeycomb_grid_with_margin([
-                          faceplate_size[0] - thickness,
+                          faceplate_size[0] - 2 * thickness,
                           faceplate_size[1] - thickness,
                           faceplate_size[2]],
                     faceplate_margin,
@@ -114,10 +113,10 @@ module cover_squared_off(
                     spacing);
             }
         }
-
+        
         if (print_faceplate_box) {
             // Make a faceplate box under the faceplate.
-            translate([0, sidebar_size[1] - thickness, 0]) {
+            translate([0, sidebar_size[1], 0]) {
                 faceplate_box([
                     faceplate_size[0],
                     faceplate_size[1],
@@ -171,7 +170,7 @@ module title_with_supports(size, margin, title_text, title_size, title_font, tit
     }
 }
 
-// Make a test plate with the lettering support holes
+// Make a test plate with the lettering support holes 
 // title_test_plate([60, 14, 2]);
 module title_test_plate(size) {
    difference() {
@@ -182,92 +181,92 @@ module title_test_plate(size) {
    }
 }
 
-// Manually adjust the lettering supports since OpenCAD cannot give the dimensions of the
+// Manually adjust the lettering supports since OpenCAD cannot give the dimensions of the 
 // letters to position automatically.
 module drawbot_letter_supports(height, radius1, radius2) {
     $fn=20;
     z_pos = -3;
-
-    // X axis points common to all the letters, homogenizing to keep things simpler.
-    x_pos_1 = 1.1;
-    x_pos_2 = 4.6;
-    x_pos_3 = 7.2;
-    x_pos_4 = 9.5;
-
+    
+    // Y axis points common to all the letters, homogenizing to keep things simpler.
+    y_pos1 = 1.1;
+    y_pos2 = 4.6;
+    y_pos3 = 7.2;
+    y_pos4 = 9.5;
+    
     // D
-    translate([2.7, x_pos_1, z_pos]) {
+    translate([2.7, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([2.7, x_pos_4, z_pos]) {
+    translate([2.7, y_pos4, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([10.1, x_pos_2, z_pos]) {
+    translate([10.1, y_pos2, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-
+    
     // r
-    translate([13.55 , x_pos_3, z_pos]) {
+    translate([13.55 , y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([13.67 , x_pos_1, z_pos]) {
+    translate([13.67 , y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([17 , x_pos_3, z_pos]) {
+    translate([17 , y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-
+    
     // a
-    translate([19.95, x_pos_3, z_pos]) {
+    translate([19.95, y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([19.4, x_pos_1, z_pos]) {
+    translate([19.4, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([23.9, x_pos_1, z_pos]) {
+    translate([23.9, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-
+    
     // w
-    translate([28, x_pos_3, z_pos]) {
+    translate([28, y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([29.7, x_pos_1, z_pos]) {
+    translate([29.7, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([32.8, x_pos_3, z_pos]) {
+    translate([32.8, y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([35, x_pos_1, z_pos]) {
+    translate([35, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([37.39, x_pos_3, z_pos]) {
+    translate([37.39, y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-
+    
     // b
-    translate([40.9, x_pos_4, z_pos]) {
+    translate([40.9, y_pos4, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([40.9, x_pos_1, z_pos]) {
+    translate([40.9, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([46.35, x_pos_2, z_pos]) {
+    translate([46.35, y_pos2, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-
+    
     // o
-    translate([49.2, x_pos_2, z_pos]) {
+    translate([49.2, y_pos2, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-    translate([55.3, x_pos_2, z_pos]) {
+    translate([55.3, y_pos2, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
-
+    
     // t
-    translate([58.9, x_pos_3, z_pos]) {
+    translate([58.9, y_pos3, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
-    }
-    translate([59.1, x_pos_1, z_pos]) {
+    }   
+    translate([59.1, y_pos1, z_pos]) {
         cylinder(h=height, r1=radius1, r2=radius2);
     }
 }

@@ -4,6 +4,19 @@ use <T-Slot.scad>;
 
 $fn=30;
 
+print_2020 = false;
+print_bearings = false;
+
+
+
+half_carriage([40, 40, 4]);
+module half_carriage(size) {
+    cube(size);
+}
+
+
+
+/*
 union() {
     union() {
         translate([0,-26,0]) {
@@ -26,33 +39,39 @@ union() {
 
 
 translate([0,0,-11]) {
-    rotate([0,90,0]) {
-        2020Profile(200);
+    if (print_2020) {
+        rotate([0,90,0]) {
+            2020Profile(200);
+        }
     }
-    translate([8,18,3.5]) {
-            bearing(model=625);
-       
-    }
-    translate([30,12,-2.5]) {
-            bearing(model=625);
-       
-    }
-    translate([52,18,3.5]) {
-            bearing(model=625);
-       
-    }
-    translate([8,-18,3.5]) {
-            bearing(model=625);
-       
-    }
-    translate([30,-12,-2.5]) {
-            bearing(model=625);
-       
-    }
-    translate([52,-18,3.5]) {
-            bearing(model=625);
+    
+    if (print_bearings) {
+        translate([8,18,3.5]) {
+                bearing(model=625);
+           
+        }
+        translate([30,12,-2.5]) {
+                bearing(model=625);
+           
+        }
+        translate([52,18,3.5]) {
+                bearing(model=625);
+           
+        }
+        translate([8,-18,3.5]) {
+                bearing(model=625);
+           
+        }
+        translate([30,-12,-2.5]) {
+                bearing(model=625);
+           
+        }
+        translate([52,-18,3.5]) {
+                bearing(model=625);
+        }
     }
 }
+*/
 
 module carriage() {
     difference() {
@@ -83,12 +102,14 @@ module gantry(size, radius=r) {
         translate([52,8,0]) {
             cylinder(h=10, r=2.5);
         }
+        /*
         translate([8,44,0]) {
             cylinder(h=10, r=2.5);
         }
         translate([52,44,0]) {
             cylinder(h=10, r=2.5);
         }
+        */
     }
     translate([8,8,-3]) {
         holed_cone(3, 2.5, 5);
@@ -147,25 +168,27 @@ module half_stem(height, radius) {
     }
 }
 
-module rounded_corner_top(size, radius=r) {
+module rounded_corner_top(size, r) {
     x = size[0];
     y = size[1];
     z = size[2];
     union() {
         difference() {
-            cube([x,y,z]);
+            cube([x,y/2,z]);
             translate([x-r,y-r,0]) {
                 cube([r,r,z]);
             }
             translate([0,y-r,0]) {
                 cube([r,r,z]);
             }
+            /*
             translate([0,0,0]) {
                 cube([r,r,z]);
             }
             translate([x-r,0,0]) {
                 cube([r,r,z]);
             }
+            */
         }
         translate([x-r,y-r,0]) {
             cylinder(h=z, r=r);
@@ -173,12 +196,14 @@ module rounded_corner_top(size, radius=r) {
         translate([r,y-r,0]) {
             cylinder(h=z, r=r);
         }
+        /*
         translate([r,r,0]) {
             cylinder(h=z, r=r);
         }
         translate([x-r,r,0]) {
             cylinder(h=z, r=r);
         }
+        */
     }
 }
 
