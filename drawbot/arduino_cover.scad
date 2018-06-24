@@ -1,11 +1,11 @@
 include <arduino.scad>
 
 // Controls for rendering partial parts of the box.
-print_sidebar = false;
+print_sidebar = true;
 print_faceplate = true;
 print_faceplate_box = true;
 print_title_support_holes = true;
-print_bottom_plate = false;
+print_bottom_plate = true;
 
 // Testing:
 
@@ -18,11 +18,11 @@ print_test_arduino_row = false;
 // TODO(dsullivan): Faceplate dimensions have changed to honeycomb.
 cover_squared_off(
     2,              // thickness
-    [140, 20, 35],  // sidebar_size
-    5,              // side_depth
+    [140, 20, 45],  // sidebar_size
+    0,              // side_depth
     [140, 65, 2],   // faceplate_size
     [7, 6],          // faceplate_margin
-    1.5,            // faceplate_frame_thickness
+    0,            // faceplate_frame_thickness
     8,              // aperature
     1.5,            // spacing
     "Drawbot",     // title_text
@@ -40,35 +40,6 @@ if (print_bottom_plate) {
     }
 }
     
-// Testing:
-
-// Print a title on the sidebar for checking alignment.
-if (print_test_title) {
-    translate([
-        sidebar_size[0] + title_margin[0],
-        sidebar_size[1] + title_margin[1],
-        sidebar_size[2] + .75]) {
-            rotate([0, 0, 180]) {
-                // This is for testing the font alignment with the holes.
-                if (print_test_title) {
-                    title_with_supports(
-                        [60, 14, 2],
-                        [1, 1],
-                        "Drawbot",
-                        12,
-                        "Abyssinica SIL:style=Italic",
-                        2,
-                        1);
-                }
-                
-                // Draw the holes for the lettering support.
-                if (print_title_support_holes) {
-                    drawbot_letter_supports(3, .5, .5);
-                }
-            }
-    }
-}
-
 if (print_test_arduino_row) {
     translate([0,0,-3]) {
         arduino_row();
@@ -103,7 +74,7 @@ module cover_squared_off(
             // Create the faceplate.
             translate([thickness,
                       sidebar_size[1],
-                      sidebar_size[2] - side_depth - 2 * thickness]) {
+                      sidebar_size[2] - side_depth - thickness]) {
                 honeycomb_grid_with_margin([
                           faceplate_size[0] - 2 * thickness,
                           faceplate_size[1] - thickness,
@@ -148,7 +119,26 @@ module sidebar(size, thickness, side_depth) {
                 thickness,
                 size[2] - side_depth]);
         }
+        translate([size[0]/4, 0, 5]) {
+            cube([70, 3, 35]);
+        }
     }
+    
+    
+    
+    /*
+    // Nameplate mounting tabs
+    translate([5.5, size[1] - 3/2, 12]) {
+        rotate([90, 0, 0]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    translate([size[0] - 5.5, size[1] - 3/2, 12]) {
+        rotate([90, 0, 180]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    */
 }
 
 // title("Drawbot", 11, "Abyssinica SIL:style=Italic", 2, 1.1);
@@ -281,7 +271,80 @@ module faceplate_box(size, thickness) {
                   size[2]]);
         }
     }
+    
+    // Faceplate mounting tabs
+    translate([5.5, 3, 4]) {
+        mounting_screw_hole(5, 3, 3, 3);
+    }
+    translate([5.5, size[1] - 5, 4]) {
+        mounting_screw_hole(5, 3, 3, 3);
+    }
+    translate([size[0] - 5.5, 3, 4]) {
+        rotate([0, 0, 180]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    translate([size[0] - 5.5, size[1] - 5, 4]) {
+        rotate([0, 0, 180]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    translate([size[0]/2, size[1] - 5, 4]) {
+        rotate([0, 0, 270]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    
+    /*
+    translate([size[0]/2, -15, 4]) {
+        rotate([0, 0, 90]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    
+    
+    // Frame mounting tabs
+    translate([size[0] - 10, size[1], 0]) {
+        mounting_tab([10, 10, 3], 5, 5);
+    }
+    translate([0, size[1], 0]) {
+        mounting_tab([10, 10, 3], 5, 5);
+    }
+    
+    // Nameplate mounting tabs
+    translate([5.5, 1, 12]) {
+        rotate([90, 0, 0]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    translate([size[0] - 5.5, 1, 12]) {
+        rotate([90, 0, 180]) {
+            mounting_screw_hole(5, 3, 3, 3);
+        }
+    }
+    */
 }
+
+module mounting_tab(size, protrusion, diameter) {
+    difference() {
+        cube([size[0], size[1] + protrusion, size[2]]);
+        translate([size[0] - diameter, size[1] - diameter + protrusion, 0]) {
+            cylinder(h=size[2], d=diameter, $fn=32);
+        }    
+    }
+}
+
+module mounting_screw_hole(outside_diameter, inside_diameter, height, protrusion) {
+    union() {
+        translate([-protrusion, 0, 0]) {
+            cube([protrusion, outside_diameter, height], center = true);
+        }
+        difference() {
+            cube([outside_diameter, outside_diameter, height], center = true);
+            cylinder(h=height, d=inside_diameter, $fn=32, center = true);
+        }
+    }
+} 
 
 // mounting_screws();
 module mounting_screws() {
@@ -318,7 +381,30 @@ module honeycomb_grid_with_margin(size, margin, aperature, spacing) {
             }
         }
     }
+    /*
+    translate([margin[0] / 2, margin[1] / 2, -size[2] + (size[2] - 4)]) {
+        screw_hole(5, 3, 6);
+    }
+    translate([size[0] - margin[0] / 2, margin[1] / 2, -size[2] + (size[2] - 4)]) {
+        screw_hole(5, 3, 6);
+    }
+    translate([size[0] - margin[0] / 2, size[1] - margin[1] / 2, -size[2] + (size[2] - 4)]) {
+        screw_hole(5, 3, 6);
+    }
+    translate([margin[0] / 2, size[1] - margin[1] / 2, -size[2] + (size[2] - 4)]) {
+        screw_hole(5, 3, 6);
+    }
+    */
 }
+
+module screw_hole(outside_diameter, inside_diameter, height) {
+    difference() {
+        cylinder(h=height, d=outside_diameter, $fn=32);
+        cylinder(h=height, d=inside_diameter, $fn=32);
+    }
+} 
+
+
 
 /*
 // frame([200, 85, 4], 2);
@@ -358,7 +444,7 @@ module hex_grid(size, aperature, spacing) {
 
     // The number of hexagons across the grid on the x axis.
     // number_cells_x = floor(size_x / (2 * hex_radius * sin60));
-    number_cells_x = floor(size_x / hex_radius) - 1;
+    number_cells_x = floor(size_x / hex_radius);
 
     // The number of hexagons across the grid on the y axis.
     number_cells_y = floor(size_y / hex_radius) - 1;
@@ -381,6 +467,7 @@ module hex_grid(size, aperature, spacing) {
     }
 }
 
+arduino_row();
 module arduino_row() {
     translate([10, 6.5, 3]) {
         arduino();
