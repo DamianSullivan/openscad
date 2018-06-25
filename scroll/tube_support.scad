@@ -13,17 +13,25 @@ color("black") {
 }
 
 // Globals
-//$fn=500;
+$fn=500;
 thickness = 3;
 
 // Tube holder
-roll_radius = 30.5;
-tube_radius = 20;
+tube_radius = 19;
 tube_support_length = 26;
 
 // The bearing or support structure.
 support_length = 12;
-support_radius = 8.25;
+
+// 8mm is exactly the radius of the bearing or motor mound. Make the
+// hole only slight bigger to fit snugly to avoid having to use glue or
+// screw in place.
+support_radius = 8.10;
+
+// The outer guide for the paper to prevent side drift when rescrolling.
+brim_radius = 35;
+// Allow some room for any excess paper roll material.
+brim_gap = 3;
 
 tube_support();
 
@@ -33,12 +41,27 @@ module tube_support() {
   // other support.
   difference() {
     // The guard disk.
-    cylinder(h=thickness, r=roll_radius, center=false);
+    cylinder(h=thickness, r=brim_radius, center=false);
     
     // The hole for the tube that will hold the bearing or support.
     cylinder(h=thickness, r=support_radius, center=false);
   }
   
+  translate([0,0, thickness]) {
+    // Add a secondary brim to form a gap for excess roll material to go,
+    // but allows the brim to stay flush with the paper to guide it.
+    difference() {
+      // The secondary brim
+      cylinder(h=thickness, r=brim_radius, center=false);
+
+      // Cut out a cylinder slightly larger than the tube support in
+      // order to make a gap for any extra paper roll material.
+      cylinder(h=2*thickness,
+               r=tube_radius + brim_gap,
+               center=false);
+    }
+  }
+
   translate([0,0,thickness]) {
     // The tube that will hold the roll. 
     tube(tube_support_length, tube_radius, thickness);
