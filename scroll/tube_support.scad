@@ -13,12 +13,14 @@ color("black") {
 }
 
 // Globals
-$fn=500;
+$fn=100;
 thickness = 3;
 
 // Tube holder
-tube_radius = 19;
-tube_support_length = 26;
+// Tube for Bienfang No. 106 is 19mm. Making this a tiny bit wider to
+// make it snug so the motor can turn it.
+tube_radius = 19.10;
+tube_support_length = 15;
 
 // The bearing or support structure.
 support_length = 12;
@@ -31,7 +33,8 @@ support_radius = 8.10;
 // The outer guide for the paper to prevent side drift when rescrolling.
 brim_radius = 35;
 // Allow some room for any excess paper roll material.
-brim_gap = 3;
+brim_gap_radius = 14;
+brim_gap_depth = 4;
 
 tube_support();
 
@@ -52,12 +55,12 @@ module tube_support() {
     // but allows the brim to stay flush with the paper to guide it.
     difference() {
       // The secondary brim
-      cylinder(h=thickness, r=brim_radius, center=false);
+      cylinder(h=brim_gap_depth, r=brim_radius, center=false);
 
       // Cut out a cylinder slightly larger than the tube support in
       // order to make a gap for any extra paper roll material.
-      cylinder(h=2*thickness,
-               r=tube_radius + brim_gap,
+      cylinder(h=brim_gap_depth,
+               r=tube_radius + brim_gap_radius,
                center=false);
     }
   }
