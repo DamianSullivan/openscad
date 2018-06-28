@@ -5,23 +5,39 @@ include <MCAD/stepper.scad>
 thickness = 3;
 $fn=100;
 
+// Whether this mount is the stepper side or the 
+stepper_side = false;
+
+// Uncomment for testing.
+//motor(model=Nema17,
+//       size=NemaMedium,
+//       dualAxis=false,
+//       pos=[0,0,0],
+//       orientation = [0,0,0]);
+
 difference() {
     // The stepper motor mount wall.
     translate([0, -10, 0]) {
         cube([50, 60, thickness], center=true);
     }
-    
-    // Stepper motor mount is 2D, extrude this to "cut" the pattern
-    // into the cube.
-    linear_extrude(height = thickness,
-                   center = true,
-                   convexity = 10,
-                   twist = 0) {
-        stepper_motor_mount(
-            nema_standard = 17,
-            slide_distance = 0,
-            mochup = false, 
-            tolerance = .25);
+
+    if (stepper_side) {
+        // Stepper motor mount is 2D, extrude this to "cut" the pattern
+        // into the cube.
+        linear_extrude(height = thickness,
+                       center = true,
+                       convexity = 10,
+                       twist = 0) {
+            stepper_motor_mount(
+                nema_standard = 17,
+                slide_distance = 0,
+                mochup = false, 
+                tolerance = .25);
+        }
+    } else {
+        translate([0, 0, -thickness/2]) {
+            cylinder(h=thickness, r=3);
+        }
     }
 }
 
@@ -65,16 +81,12 @@ translate([-25+thickness, 20, thickness/2]) {
     }
 }
 
-translate([0,-23,17]) {
-  cube([50, thickness, 34], center=true);
+// Motor plate.
+if (stepper_side) {
+    translate([0,-23,17]) {
+      cube([50, thickness, 34], center=true);
+    }
 }
-
-
-motor(model=Nema17,
-       size=NemaMedium,
-       dualAxis=false,
-       pos=[0,0,0],
-       orientation = [0,0,0]);
 
 module prism(l, w, h) {
     polyhedron(
