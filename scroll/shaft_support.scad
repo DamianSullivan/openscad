@@ -8,7 +8,7 @@ include <MCAD/stepper.scad>
  thickness = 3;
  support_length = 20;
  support_radius = 10;
- shaft_radius = 2.5;
+ shaft_radius = 3.5;
  
  shaft_support();
  module shaft_support() {   
@@ -42,22 +42,23 @@ include <MCAD/stepper.scad>
     }
     
     // Support braces
-    translate([-thickness/2, -15, 0]) {
+    brace_spacing = 2 * (shaft_radius + thickness) + thickness;
+    translate([-thickness/2, -brace_spacing, 0]) {
         rotate([0, 0, 0]) {
             prism(thickness, 10, support_length);
         }
     }
-    translate([15, -thickness/2, 0]) {
+    translate([brace_spacing, -thickness/2, 0]) {
         rotate([0, 0, 90]) {
             prism(thickness, 10, support_length);
         }
     }
-    translate([thickness/2, 15, 0]) {
+    translate([thickness/2, brace_spacing, 0]) {
         rotate([0, 0, 180]) {
             prism(thickness, 10, support_length);
         }
     }
-    translate([-15, thickness/2, 0]) {
+    translate([-brace_spacing, thickness/2, 0]) {
         rotate([0, 0, 270]) {
             prism(thickness, 10, support_length);
         }
