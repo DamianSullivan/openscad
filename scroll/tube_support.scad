@@ -1,17 +1,3 @@
-include <MCAD/bearing.scad>
-
-working_dir = "/home/dsullivan/src/openscad/scroll";
-
-rotate([90,0,0]) {
-    translate([-34,0,-30]) {
-      //import(str(working_dir, "/TowelPart1_V2.STL"));
-    }
-}
-
-color("black") {
-  // bearing(model=608);
-}
-
 // Globals
 $fn=100;
 thickness = 3;
@@ -19,7 +5,7 @@ thickness = 3;
 // Tube holder
 // Tube for Bienfang No. 106 is 19mm. Making this a tiny bit wider to
 // make it snug so the motor can turn it.
-tube_radius = 19.10;
+tube_radius = 19;
 tube_support_length = 15;
 
 // The bearing or support structure.
@@ -28,7 +14,7 @@ support_length = 12;
 // 8mm is exactly the radius of the bearing or motor mound. Make the
 // hole only slight bigger to fit snugly to avoid having to use glue or
 // screw in place.
-support_radius = 8.10;
+support_radius = 8.20;
 
 // The outer guide for the paper to prevent side drift when rescrolling.
 brim_radius = 35;
@@ -37,6 +23,9 @@ brim_gap_radius = 14;
 brim_gap_depth = 4;
 
 tube_support();
+translate([0,0,thickness]) {
+    tube_grip(tube_radius, .4, tube_support_length);
+}
 
 module tube_support() {
     
@@ -84,6 +73,19 @@ module tube_support() {
       }
     }
   }
+}
+
+module tube_grip(tube_radius, grip_radius, height) {
+    for (i=[1:45:360]) {
+        rotate([0,0,i]) {
+            translate([0,tube_radius,0]) {
+                translate([0,0,height/2]) {
+                    cylinder(h=height/2, r1=grip_radius, r2=0, center=false);
+                }
+                cylinder(h=height/2, r=grip_radius, center=false);
+            }
+        }
+    }
 }
 
 // Make a tube with an outer radius with the wall thickness
