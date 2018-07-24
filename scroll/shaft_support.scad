@@ -1,17 +1,13 @@
 include <MCAD/motors.scad>
-include <MCAD/stepper.scad>
+ 
+$fn=100;
+thickness = 3;
+support_length = 30;
+support_radius = 10;
+shaft_radius = 2.90;
 
-// Uncomment for testing.
-//motor(model=Nema17, size=NemaMedium, dualAxis=false, pos=[0,0,0], orientation = [0,0,0]);
- 
- $fn=100;
- thickness = 3;
- support_length = 20;
- support_radius = 10;
- shaft_radius = 3.5;
- 
- shaft_support();
- module shaft_support() {   
+shaft_support();
+module shaft_support() {   
     difference() {
         // The stepper motor mount wall.
         translate([0, 0, 0]) {
