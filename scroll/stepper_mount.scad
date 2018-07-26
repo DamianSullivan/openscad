@@ -15,7 +15,7 @@ stepper_side = true;
 //       pos=[0,0,0],
 //       orientation = [0,0,0]);
 
-stepper_mount();
+//stepper_mount();
 
 module stepper_mount() {
     difference() {
